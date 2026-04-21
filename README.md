@@ -1,21 +1,41 @@
-# Yomitan
+# Shimatan (しまたん)
 
-[![Get Yomitan for Chrome](<https://img.shields.io/chrome-web-store/v/likgccmbimhjbgkjambclfkhldnlhbnn?logo=Google%20Chrome&style=for-the-badge&logoColor=lightblue&color=lightblue&label=get%20yomitan%20for%20chrome%20(stable)>)](https://chrome.google.com/webstore/detail/yomitan/likgccmbimhjbgkjambclfkhldnlhbnn)
-[![Get Yomitan for Firefox](<https://img.shields.io/amo/v/yomitan?logo=Firefox&style=for-the-badge&color=orange&label=get%20yomitan%20for%20firefox%20(stable)>)](https://addons.mozilla.org/en-US/firefox/addon/yomitan/)
-[![Get Yomitan for Edge](https://img.shields.io/badge/dynamic/json?logo=puzzle&label=get%20yomitan%20for%20edge&style=for-the-badge&query=%24.version&url=https%3A%2F%2Fmicrosoftedge.microsoft.com%2Faddons%2Fgetproductdetailsbycrxid%2Fidelnfbbmikgfiejhgmddlbkfgiifnnn)](https://microsoftedge.microsoft.com/addons/detail/yomitan/idelnfbbmikgfiejhgmddlbkfgiifnnn)
-[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/yomidevs/yomitan/badge?style=for-the-badge)](https://securityscorecards.dev/viewer/?uri=github.com/yomidevs/yomitan)
+**Yomitan fork with built-in [Shima Bird](https://github.com/Lalafella) export support.**
 
-[![Discord](https://dcbadge.limes.pink/api/server/YkQrXW6TXF?style=for-the-badge)](https://discord.gg/YkQrXW6TXF)
+Browse Japanese text on any webpage, collect words with one click, and import them into the Shima Bird vocabulary app via QR code or JSON.
 
-# Visit [yomitan.wiki](https://yomitan.wiki) to learn more!
+## Shima Bird Features
 
-:wave: **Yomitan is [the successor](https://foosoft.net/posts/passing-the-torch-to-yomitan/) to Yomichan** ([migration guide](https://yomitan.wiki/yomichan-migration/)) which was [sunset](https://foosoft.net/posts/sunsetting-the-yomichan-project/) by its owner on Feb 26, 2023. We have made a number of foundational changes to ensure **the project stays alive, works on latest browser versions, and is easy to contribute to**.
+- 🐦 **One-click export** — Click the Shima button on any word popup to add it to your export list
+- 📋 **Batch collection** — Collect up to 20 words per session
+- 📱 **QR code export** — Generate a QR code (up to 5 words) to scan with the Shima Bird app
+- 📄 **JSON export** — Copy vocab data for larger batches (>5 words)
+- ✕ **Edit before export** — Review and remove unwanted words from your list
 
-📢 **New contributors [welcome](#contributing)!**
+## How to Install
 
-📢 **Interested in adding a new language to Yomitan? See [here](./docs/development/language-features.md) for thorough documentation!**
+1. Download `shimatan-chrome.zip` from [Releases](https://github.com/Lalafella/shimatan/releases)
+2. Unzip the file
+3. Open `chrome://extensions/` (or `edge://extensions/`)
+4. Enable **Developer mode** (top-right toggle)
+5. Click **Load unpacked** and select the unzipped folder
+6. **Disable Yomitan** if installed (to avoid conflicts)
 
-## What is Yomitan?
+## How to Use
+
+1. Hover over Japanese text on any webpage
+2. Click 🐦 **Shima** to add words to your export list
+3. Click the floating badge (bottom-right) to review your list
+4. Remove unwanted words with ✕
+5. **≤5 words** → Generate QR → Scan with Shima Bird app
+6. **>5 words** → Copy Vocab Data → Paste in Shima Bird app
+7. In Shima Bird: **Tools → Yomitan Import**
+
+---
+
+# Yomitan (Original)
+
+Shimatan is based on [Yomitan](https://github.com/yomidevs/yomitan). All original Yomitan features are fully preserved.
 
 Yomitan turns your web browser into a tool for building language literacy by helping you **read** texts that would otherwise be too difficult to tackle in [a variety of supported languages](https://yomitan.wiki/supported-languages/).
 

@@ -72,8 +72,8 @@ export class DisplayShima {
 
         if (!data.w) { return; }
         if (this._wordList.some((w) => w.w === data.w)) { return; }
-        if (this._wordList.length >= 10) {
-            this._showToast('Maximum 10 words reached');
+        if (this._wordList.length >= 20) {
+            this._showToast('Maximum 20 words reached');
             return;
         }
 
@@ -160,7 +160,7 @@ export class DisplayShima {
 
         const countSpan = document.createElement('span');
         countSpan.style.cssText = 'color: #aaa; font-size: 13px;';
-        countSpan.textContent = `${this._wordList.length}/10`;
+        countSpan.textContent = `${this._wordList.length}/20`;
 
         headerRight.appendChild(helpBtn);
         headerRight.appendChild(countSpan);
@@ -189,19 +189,37 @@ export class DisplayShima {
             overlay.remove();
         });
 
+        const canQr = this._wordList.length > 0 && this._wordList.length <= 5;
         const qrBtn = document.createElement('button');
-        qrBtn.textContent = 'Generate QR';
+        qrBtn.textContent = canQr ? 'Generate QR' : 'Copy Vocab Data';
         qrBtn.disabled = this._wordList.length === 0;
         qrBtn.style.cssText = `
-            flex: 2; background: linear-gradient(135deg, #4FC3F7, #0288D1);
+            flex: 2; background: linear-gradient(135deg, ${canQr ? '#4FC3F7, #0288D1' : '#27ae60, #1e8449'});
             color: #fff; border: none; border-radius: 10px; padding: 12px;
             cursor: pointer; font-size: 14px; font-weight: bold;
             ${this._wordList.length === 0 ? 'opacity: 0.5; cursor: default;' : ''}
         `;
         qrBtn.addEventListener('click', () => {
             if (this._wordList.length === 0) { return; }
-            overlay.remove();
-            this._showQrPopup();
+            if (canQr) {
+                overlay.remove();
+                this._showQrPopup();
+            } else {
+                const json = JSON.stringify(this._wordList);
+                try {
+                    const ta = document.createElement('textarea');
+                    ta.value = json;
+                    ta.style.cssText = 'position:fixed;left:-9999px';
+                    document.body.appendChild(ta);
+                    ta.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(ta);
+                    qrBtn.textContent = 'Copied!';
+                    setTimeout(() => { qrBtn.textContent = 'Copy Vocab Data'; }, 1500);
+                } catch (_) {
+                    qrBtn.textContent = 'Failed';
+                }
+            }
         });
 
         btnRow.appendChild(clearBtn);
@@ -209,6 +227,12 @@ export class DisplayShima {
 
         card.appendChild(header);
         card.appendChild(list);
+        if (!canQr && this._wordList.length > 0) {
+            const hint = document.createElement('div');
+            hint.textContent = 'QR export only supports 5 or fewer words. Use Copy Vocab Data instead.';
+            hint.style.cssText = 'color: #f39c12; font-size: 11px; margin-bottom: 10px; text-align: center;';
+            card.appendChild(hint);
+        }
         card.appendChild(btnRow);
         overlay.appendChild(card);
         document.body.appendChild(overlay);
@@ -254,7 +278,7 @@ export class DisplayShima {
                     this._renderWordList(container, overlay);
                     // Update header count
                     const countSpan = overlay.querySelector('span:last-child');
-                    if (countSpan) { countSpan.textContent = `${this._wordList.length}/10`; }
+                    if (countSpan) { countSpan.textContent = `${this._wordList.length}/20`; }
                 }
             });
 
@@ -269,7 +293,20 @@ export class DisplayShima {
     }
 
     _showQrPopup() {
-        const json = JSON.stringify(this._wordList);
+        const QR_BATCH = 5;
+        const batches = [];
+        for (let i = 0; i < this._wordList.length; i += QR_BATCH) {
+            batches.push(this._wordList.slice(i, i + QR_BATCH));
+        }
+        this._currentBatch = 0;
+        this._batches = batches;
+        this._showQrBatch();
+    }
+
+    _showQrBatch() {
+        const batch = this._batches[this._currentBatch];
+        const json = JSON.stringify(batch);
+        const totalBatches = this._batches.length;
 
         const existing = document.getElementById('shima-list-overlay');
         if (existing) { existing.remove(); }
@@ -288,7 +325,8 @@ export class DisplayShima {
         `;
 
         const title = document.createElement('div');
-        title.textContent = `🐦 Scan with Shima Bird (${this._wordList.length} words)`;
+        const batchLabel = totalBatches > 1 ? ` (${this._currentBatch + 1}/${totalBatches})` : '';
+        title.textContent = `🐦 Scan with Shima Bird${batchLabel}`;
         title.style.cssText = 'color: #fff; font-size: 15px; font-weight: bold; margin-bottom: 12px;';
 
         const qrContainer = document.createElement('div');
@@ -296,6 +334,10 @@ export class DisplayShima {
             background: #fff; border-radius: 12px; padding: 12px;
             display: inline-block; margin: 4px 0;
         `;
+
+        const hint = document.createElement('div');
+        hint.textContent = 'Try fewer words if QR won\'t scan (or try Copy JSON instead).';
+        hint.style.cssText = 'color: #888; font-size: 10px; margin-top: 6px;';
 
         const btnRow = document.createElement('div');
         btnRow.style.cssText = 'display: flex; gap: 6px; margin-top: 10px; justify-content: center;';
@@ -333,6 +375,21 @@ export class DisplayShima {
             }
         });
 
+        if (totalBatches > 1 && this._currentBatch < totalBatches - 1) {
+            const nextBtn = document.createElement('button');
+            nextBtn.textContent = 'Next →';
+            nextBtn.style.cssText = `
+                background: #4FC3F7; color: #fff; border: none; border-radius: 8px;
+                padding: 8px 16px; cursor: pointer; font-size: 12px; font-weight: bold;
+            `;
+            nextBtn.addEventListener('click', () => {
+                this._currentBatch++;
+                overlay.remove();
+                this._showQrBatch();
+            });
+            btnRow.appendChild(nextBtn);
+        }
+
         const doneBtn = document.createElement('button');
         doneBtn.textContent = 'Done';
         doneBtn.style.cssText = `
@@ -351,6 +408,7 @@ export class DisplayShima {
 
         card.appendChild(title);
         card.appendChild(qrContainer);
+        card.appendChild(hint);
         card.appendChild(btnRow);
         overlay.appendChild(card);
         document.body.appendChild(overlay);
@@ -422,11 +480,12 @@ export class DisplayShima {
                 </div>
                 <div style="color: #ddd; font-size: 13px; line-height: 1.8;">
                     <div style="margin-bottom: 10px;"><b style="color: #4FC3F7;">1.</b> Hover over Japanese text</div>
-                    <div style="margin-bottom: 10px;"><b style="color: #4FC3F7;">2.</b> Click 🐦 to add words (max 10)</div>
+                    <div style="margin-bottom: 10px;"><b style="color: #4FC3F7;">2.</b> Click 🐦 to add words (max 20)</div>
                     <div style="margin-bottom: 10px;"><b style="color: #4FC3F7;">3.</b> Click the floating badge to review</div>
                     <div style="margin-bottom: 10px;"><b style="color: #4FC3F7;">4.</b> Remove unwanted words with ✕</div>
-                    <div style="margin-bottom: 10px;"><b style="color: #4FC3F7;">5.</b> Tap <b>Generate QR</b></div>
-                    <div style="margin-bottom: 10px;"><b style="color: #4FC3F7;">6.</b> Open Shima Bird → Tools → Yomitan Import → Scan</div>
+                    <div style="margin-bottom: 10px;"><b style="color: #4FC3F7;">5a.</b> ≤5 words → <b>Generate QR</b> → Scan with Shima Bird app</div>
+                    <div style="margin-bottom: 10px;"><b style="color: #4FC3F7;">5b.</b> >5 words → <b>Copy Vocab Data</b> → Paste in Shima Bird app</div>
+                    <div style="margin-bottom: 10px;"><b style="color: #4FC3F7;">6.</b> Open Shima Bird → Tools → <b>Yomitan Import</b></div>
                 </div>
             </div>
         `;

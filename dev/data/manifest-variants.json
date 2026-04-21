@@ -106,7 +106,9 @@
                     "popup.html",
                     "template-renderer.html",
                     "js/*",
-                    "lib/resvg.wasm"
+                    "lib/resvg.wasm",
+                    "lib/qrcode.js",
+                    "lib/qrcode.min.js"
                 ],
                 "matches": [
                     "<all_urls>"

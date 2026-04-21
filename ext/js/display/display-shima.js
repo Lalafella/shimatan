@@ -48,7 +48,7 @@ export class DisplayShima {
         button.className = 'action-button shima-export-button';
         button.title = 'Add to Shima Bird';
         button.dataset.action = 'shima-export';
-        button.innerHTML = '<span class="action-icon" style="font-size: 16px;">🐦</span>';
+        button.innerHTML = '<span class="action-icon" style="font-size: 16px;">🐦</span><span style="font-size: 11px; margin-left: 2px;">Shima</span>';
         button.addEventListener('click', this._onShimaAddBind);
 
         const wrapper = document.createElement('div');
@@ -68,7 +68,7 @@ export class DisplayShima {
 
         if (index < 0 || index >= entries.length) { return; }
 
-        const data = this._extractEntryData(entries[index]);
+        const data = this._extractEntryData(entries[index], index);
 
         if (!data.w) { return; }
         if (this._wordList.some((w) => w.w === data.w)) { return; }
@@ -278,32 +278,38 @@ export class DisplayShima {
         overlay.id = 'shima-list-overlay';
         overlay.style.cssText = `
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.85); z-index: 99999;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            cursor: pointer;
+            background: #1a1a2e; z-index: 99999;
+            overflow-y: auto; padding: 16px;
         `;
-        overlay.addEventListener('click', () => overlay.remove());
 
         const card = document.createElement('div');
         card.style.cssText = `
-            background: #1a1a2e; border-radius: 16px; padding: 24px;
-            text-align: center; max-width: 320px; width: 90%;
-            cursor: default; border: 1px solid rgba(255,255,255,0.1);
+            text-align: center; max-width: 320px; margin: 0 auto;
         `;
-        card.addEventListener('click', (e) => e.stopPropagation());
 
         const title = document.createElement('div');
         title.textContent = `🐦 Scan with Shima Bird (${this._wordList.length} words)`;
-        title.style.cssText = 'color: #fff; font-size: 15px; font-weight: bold; margin-bottom: 16px;';
+        title.style.cssText = 'color: #fff; font-size: 15px; font-weight: bold; margin-bottom: 12px;';
 
         const qrContainer = document.createElement('div');
         qrContainer.style.cssText = `
-            background: #fff; border-radius: 12px; padding: 16px;
-            display: inline-block; margin: 8px 0;
+            background: #fff; border-radius: 12px; padding: 12px;
+            display: inline-block; margin: 4px 0;
         `;
 
         const btnRow = document.createElement('div');
-        btnRow.style.cssText = 'display: flex; gap: 8px; margin-top: 16px; justify-content: center;';
+        btnRow.style.cssText = 'display: flex; gap: 6px; margin-top: 10px; justify-content: center;';
+
+        const backBtn = document.createElement('button');
+        backBtn.textContent = '← Back';
+        backBtn.style.cssText = `
+            background: rgba(255,255,255,0.1); color: #fff; border: none; border-radius: 8px;
+            padding: 8px 16px; cursor: pointer; font-size: 12px;
+        `;
+        backBtn.addEventListener('click', () => {
+            overlay.remove();
+            this._showListPopup();
+        });
 
         const copyBtn = document.createElement('button');
         copyBtn.textContent = 'Copy JSON';
@@ -312,10 +318,19 @@ export class DisplayShima {
             padding: 8px 16px; cursor: pointer; font-size: 12px;
         `;
         copyBtn.addEventListener('click', () => {
-            navigator.clipboard.writeText(json).then(() => {
+            try {
+                const ta = document.createElement('textarea');
+                ta.value = json;
+                ta.style.cssText = 'position:fixed;left:-9999px';
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
                 copyBtn.textContent = 'Copied!';
                 setTimeout(() => { copyBtn.textContent = 'Copy JSON'; }, 1500);
-            });
+            } catch (_) {
+                copyBtn.textContent = 'Failed';
+            }
         });
 
         const doneBtn = document.createElement('button');
@@ -330,6 +345,7 @@ export class DisplayShima {
             overlay.remove();
         });
 
+        btnRow.appendChild(backBtn);
         btnRow.appendChild(copyBtn);
         btnRow.appendChild(doneBtn);
 
@@ -347,15 +363,25 @@ export class DisplayShima {
      * @param {string} text
      */
     _renderQr(container, text) {
-        const img = document.createElement('img');
-        img.src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(text)}`;
-        img.alt = 'QR Code';
-        img.style.cssText = 'width: 220px; height: 220px;';
-        img.onerror = () => {
-            container.textContent = 'QR generation failed. Use Copy JSON instead.';
+        if (typeof globalThis.QRCodeLib === 'undefined') {
+            container.textContent = 'QR library not loaded. Use Copy JSON.';
             container.style.cssText += 'color: #666; font-size: 12px; padding: 40px 16px;';
-        };
-        container.appendChild(img);
+            return;
+        }
+        const canvas = document.createElement('canvas');
+        canvas.style.cssText = 'width: 220px; height: 220px;';
+        globalThis.QRCodeLib.toCanvas(canvas, text, {
+            width: 220,
+            margin: 2,
+            errorCorrectionLevel: 'M',
+        }, (err) => {
+            if (err) {
+                container.textContent = 'QR failed. Use Copy JSON.';
+                container.style.cssText += 'color: #666; font-size: 12px; padding: 40px 16px;';
+            } else {
+                container.appendChild(canvas);
+            }
+        });
     }
 
     /**
@@ -381,50 +407,31 @@ export class DisplayShima {
         overlay.id = 'shima-help-overlay';
         overlay.style.cssText = `
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.85); z-index: 100000;
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer;
+            background: #1a1a2e; z-index: 100000;
+            overflow-y: auto; padding: 16px;
         `;
-        overlay.addEventListener('click', () => overlay.remove());
 
-        const card = document.createElement('div');
-        card.style.cssText = `
-            background: #1a1a2e; border-radius: 16px; padding: 24px;
-            max-width: 360px; width: 90%; cursor: default;
-            border: 1px solid rgba(255,255,255,0.1);
-        `;
-        card.addEventListener('click', (e) => e.stopPropagation());
-
-        card.innerHTML = `
-            <div style="color: #fff; font-size: 17px; font-weight: bold; margin-bottom: 16px;">
-                🐦 How to use Shimatan
-            </div>
-            <div style="color: #ddd; font-size: 13px; line-height: 1.8;">
-                <div style="margin-bottom: 12px;">
-                    <b style="color: #4FC3F7;">Step 1:</b> Hover over Japanese text on any webpage
+        overlay.innerHTML = `
+            <div style="max-width: 360px; margin: 0 auto;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                    <span style="color: #fff; font-size: 16px; font-weight: bold;">🐦 How to use</span>
+                    <button id="shima-help-close" style="
+                        background: rgba(255,255,255,0.1); color: #fff; border: none;
+                        border-radius: 8px; padding: 6px 12px; cursor: pointer; font-size: 13px;
+                    ">✕ Close</button>
                 </div>
-                <div style="margin-bottom: 12px;">
-                    <b style="color: #4FC3F7;">Step 2:</b> Click the 🐦 button to add words to your export list (max 10)
-                </div>
-                <div style="margin-bottom: 12px;">
-                    <b style="color: #4FC3F7;">Step 3:</b> Click the floating badge at bottom-right to review your list
-                </div>
-                <div style="margin-bottom: 12px;">
-                    <b style="color: #4FC3F7;">Step 4:</b> Remove unwanted words with ✕, then tap <b>Generate QR</b>
-                </div>
-                <div style="margin-bottom: 12px;">
-                    <b style="color: #4FC3F7;">Step 5:</b> Open <b>Shima Bird</b> app → Tools → <b>Yomitan Import</b> → Scan the QR code
+                <div style="color: #ddd; font-size: 13px; line-height: 1.8;">
+                    <div style="margin-bottom: 10px;"><b style="color: #4FC3F7;">1.</b> Hover over Japanese text</div>
+                    <div style="margin-bottom: 10px;"><b style="color: #4FC3F7;">2.</b> Click 🐦 to add words (max 10)</div>
+                    <div style="margin-bottom: 10px;"><b style="color: #4FC3F7;">3.</b> Click the floating badge to review</div>
+                    <div style="margin-bottom: 10px;"><b style="color: #4FC3F7;">4.</b> Remove unwanted words with ✕</div>
+                    <div style="margin-bottom: 10px;"><b style="color: #4FC3F7;">5.</b> Tap <b>Generate QR</b></div>
+                    <div style="margin-bottom: 10px;"><b style="color: #4FC3F7;">6.</b> Open Shima Bird → Tools → Yomitan Import → Scan</div>
                 </div>
             </div>
-            <button style="
-                width: 100%; background: #4FC3F7; color: #fff; border: none;
-                border-radius: 10px; padding: 10px; cursor: pointer;
-                font-size: 14px; font-weight: bold; margin-top: 8px;
-            ">Got it!</button>
         `;
-        card.querySelector('button').addEventListener('click', () => overlay.remove());
+        overlay.querySelector('#shima-help-close').addEventListener('click', () => overlay.remove());
 
-        overlay.appendChild(card);
         document.body.appendChild(overlay);
     }
 
@@ -432,30 +439,57 @@ export class DisplayShima {
      * @param {import('dictionary').DictionaryEntry} entry
      * @returns {object}
      */
-    _extractEntryData(entry) {
+    _extractEntryData(entry, nodeIndex) {
         if (entry.type === 'term') {
             const headword = entry.headwords[0] || {};
             const term = headword.term || '';
             const reading = headword.reading || '';
 
             const meanings = [];
+            // Collect tag/dict names to strip from text
+            const skipWords = new Set();
             for (const def of entry.definitions || []) {
-                for (const entry2 of def.entries || []) {
-                    if (typeof entry2 === 'string') {
-                        meanings.push(entry2);
-                    } else if (entry2 && entry2.text) {
-                        meanings.push(entry2.text);
+                if (def.dictionary) { skipWords.add(def.dictionary); }
+                for (const tag of def.tags || []) {
+                    if (tag.name) { skipWords.add(tag.name); }
+                    if (tag.content) { skipWords.add(tag.content); }
+                }
+            }
+            for (const hw of entry.headwords || []) {
+                for (const tag of hw.tags || []) {
+                    if (tag.name) { skipWords.add(tag.name); }
+                }
+            }
+            // Extract from rendered DOM — target glossary li elements directly
+            const entryNodes = this._display.dictionaryEntryNodes;
+            if (entryNodes && nodeIndex >= 0 && nodeIndex < entryNodes.length) {
+                const node = entryNodes[nodeIndex];
+                const glossLis = node.querySelectorAll('[data-sc-content="glossary"] li');
+                for (const li of glossLis) {
+                    const t = li.textContent.trim();
+                    if (t && !meanings.includes(t)) { meanings.push(t); }
+                }
+                // Fallback: plain gloss-content if no structured content
+                if (meanings.length === 0) {
+                    const glossItems = node.querySelectorAll('.gloss-content');
+                    for (const el of glossItems) {
+                        const t = el.textContent.trim();
+                        if (t && !meanings.includes(t)) { meanings.push(t); }
                     }
                 }
             }
-            if (meanings.length === 0) {
-                for (const def of entry.definitions || []) {
-                    if (def.glosses) {
-                        for (const g of def.glosses) {
-                            if (typeof g === 'string') { meanings.push(g); }
-                        }
-                    }
+
+            // Extract POS from rendered DOM
+            let pos = '';
+            if (entryNodes && nodeIndex >= 0 && nodeIndex < entryNodes.length) {
+                const node = entryNodes[nodeIndex];
+                const posEls = node.querySelectorAll('[data-sc-content="part-of-speech-info"]');
+                const posSet = new Set();
+                for (const el of posEls) {
+                    const t = el.textContent.trim();
+                    if (t) { posSet.add(t); }
                 }
+                pos = [...posSet].join(', ');
             }
 
             return {
@@ -463,7 +497,7 @@ export class DisplayShima {
                 w: term,
                 r: reading !== term ? reading : '',
                 m: meanings.join('; '),
-                p: this._extractPos(entry),
+                p: pos,
             };
         }
 
@@ -482,6 +516,43 @@ export class DisplayShima {
         }
 
         return {app: 'shima', v: 1, w: '', r: '', m: '', p: ''};
+    }
+
+    /**
+     * @param {*} g - TermGlossaryContent (string | {type:'text',text} | {type:'structured-content',content} | array)
+     * @returns {string}
+     */
+    _extractGlossText(g) {
+        if (typeof g === 'string') { return g; }
+        if (!g) { return ''; }
+        if (g.type === 'text') { return g.text || ''; }
+        if (g.type === 'structured-content') {
+            return this._extractStructuredText(g.content);
+        }
+        if (Array.isArray(g)) {
+            // Deinflection tuple [uninflected, rules[]]
+            if (g.length >= 1 && typeof g[0] === 'string') { return g[0]; }
+        }
+        return '';
+    }
+
+    /**
+     * @param {*} content - StructuredContent (string | object | array)
+     * @returns {string}
+     */
+    _extractStructuredText(content) {
+        if (typeof content === 'string') { return content; }
+        if (Array.isArray(content)) {
+            return content.map((c) => this._extractStructuredText(c)).filter(Boolean).join(' ');
+        }
+        if (content && typeof content === 'object') {
+            if (content.type === 'image') { return ''; }
+            // Skip tag-like elements (data-sc-content="tag")
+            if (content.data && content.data['sc-content'] === 'tag') { return ''; }
+            if (content.content) { return this._extractStructuredText(content.content); }
+            if (content.tag === 'br') { return ' '; }
+        }
+        return '';
     }
 
     /**

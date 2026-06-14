@@ -62,7 +62,7 @@ _(If it fails: generate a new link, paste it again, and re-toggle.)_
 ![Inbox](images/connect/09-inbox.png)
 ![Create card](images/connect/10-create-card.png)
 
-Tap **AI Autofill** to fill in the explanation + **example sentences (up to 3)** automatically.
+_(Optional)_ You can tap **AI Autofill** to fill in the explanation + **example sentences (up to 3)** automatically.
 
 ![AI example sentences](images/connect/11-ai-examples.png)
 

@@ -47,7 +47,7 @@
 <img src="images/connect/06-app-pairing.png" width="360">
 
 **8.** กด **Enable Anki Connection** — ถ้าสำเร็จจะขึ้น **Connected**
-_(ถ้า Fail: กดสร้างลิงก์ใหม่อีกครั้งก่อนเอาไปวาง แล้ว retoggle อีกรอบ)_
+_(ถ้า Fail: ลอง retoggle (ปิด-เปิด) 1 ครั้งก่อน — ถ้ายังไม่เชื่อมต่อ ค่อยกดสร้างลิงก์ใหม่แล้ววางอีกครั้ง)_
 
 **9.** กด **Configure Anki Flashcard** เลือก **Deck : Shima Bird Inbox**, **Model : Shima Bird** แล้วกด **Close** — ช่อง field จะถูก map ให้อัตโนมัติ (Expression / Reading / Glossary / Sentence / URL)
 

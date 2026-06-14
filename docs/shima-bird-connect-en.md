@@ -47,7 +47,7 @@ In the app — find Shima Bird Connect (under Immersion), create the link, then 
 <img src="images/connect/06-app-pairing.png" width="360">
 
 **8.** Tap **Enable Anki Connection** — on success it shows **Connected**.
-_(If it fails: generate a new link, paste it again, and re-toggle.)_
+_(If it fails: re-toggle it once first; if it still won't connect, generate a new link, paste it again, and re-toggle.)_
 
 **9.** Tap **Configure Anki Flashcard**, choose **Deck: Shima Bird Inbox**, **Model: Shima Bird**, then **Close** — the fields auto-map (Expression / Reading / Glossary / Sentence / URL).
 

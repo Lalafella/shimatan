@@ -33,7 +33,7 @@ Go to https://yomitan.wiki — it has install links for all three browsers; pick
 
 **6.** Click the Yomitan icon on the toolbar → a popup appears → click the **gear** to open Settings → select the **Anki** tab.
 
-![Yomitan icon popup](images/connect/05-yomitan-icon.png)
+<img src="images/connect/05-yomitan-icon.png" width="400">
 
 > Don't see the Yomitan icon? Click the **Extensions (puzzle)** button and **pin** Yomitan to the toolbar — if it's still unresponsive, switch browser tabs first.
 
@@ -51,11 +51,11 @@ _(If it fails: generate a new link, paste it again, and re-toggle.)_
 
 **9.** Tap **Configure Anki Flashcard**, choose **Deck: Shima Bird Inbox**, **Model: Shima Bird**, then **Close** — the fields auto-map (Expression / Reading / Glossary / Sentence / URL).
 
-![Configure card](images/connect/07-configure-card.png)
+<img src="images/connect/07-configure-card.png" width="400">
 
 **10.** Open any Japanese page. Hold **Shift** while pointing at a Japanese word → a definition pops up with a green **＋** button at the top-right → click it, and the word is sent to the Shima Bird server.
 
-![Mine a word](images/connect/08-mine-word.png)
+<img src="images/connect/08-mine-word.png" width="400">
 
 **11.** Tap **Refresh** in Shima Bird Connect — your mined words appear → tap **＋** to import → the **Create New Card** page opens pre-filled (word / reading / meaning / kanji breakdown).
 
@@ -68,7 +68,7 @@ _(Optional)_ You can tap **AI Autofill** to fill in the explanation + **example 
 
 **12.** Pick a **Deck** + **Study Mode** at the bottom, then tap **Add to Quick Study** to start learning right away (or **Create Only** to save for later).
 
-![Add to Quick Study](images/connect/12-add-to-study.png)
+<img src="images/connect/12-add-to-study.png" width="360">
 
 ### Limits
 

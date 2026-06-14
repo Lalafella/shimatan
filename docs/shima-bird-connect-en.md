@@ -39,12 +39,12 @@ Go to https://yomitan.wiki — it has install links for all three browsers; pick
 
 **7.** Open Shima Bird → bottom-right menu → **Shima Bird Connect** → **Create link** → copy it into Yomitan's **AnkiConnect server address** field (replacing the default `http://127.0.0.1:8765`).
 
-![Yomitan Anki settings](images/connect/06-yomitan-anki.png)
+<img src="images/connect/06-yomitan-anki.png" width="400">
 
 In the app — find Shima Bird Connect (under Immersion), create the link, then copy it:
 
-![Shima Bird Connect in the app](images/connect/06-app-connect.jpg)
-![Create pairing link](images/connect/06-app-pairing.png)
+<img src="images/connect/06-app-connect.jpg" width="360">
+<img src="images/connect/06-app-pairing.png" width="360">
 
 **8.** Tap **Enable Anki Connection** — on success it shows **Connected**.
 _(If it fails: generate a new link, paste it again, and re-toggle.)_
@@ -59,12 +59,12 @@ _(If it fails: generate a new link, paste it again, and re-toggle.)_
 
 **11.** Tap **Refresh** in Shima Bird Connect — your mined words appear → tap **＋** to import → the **Create New Card** page opens pre-filled (word / reading / meaning / kanji breakdown).
 
-![Inbox](images/connect/09-inbox.png)
-![Create card](images/connect/10-create-card.png)
+<img src="images/connect/09-inbox.png" width="400">
+<img src="images/connect/10-create-card.png" width="360">
 
 _(Optional)_ You can tap **AI Autofill** to fill in the explanation + **example sentences (up to 3)** automatically.
 
-![AI example sentences](images/connect/11-ai-examples.png)
+<img src="images/connect/11-ai-examples.png" width="360">
 
 **12.** Pick a **Deck** + **Study Mode** at the bottom, then tap **Add to Quick Study** to start learning right away (or **Create Only** to save for later).
 
